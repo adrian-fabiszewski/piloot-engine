@@ -1,33 +1,54 @@
 buildscript {
     ext {
         springBootVersion = '2.0.4.RELEASE'
+        groovyAllVersion = '2.4.13'
+        lombokVersion = '1.16.18'
+        spockVersion = '1.1-groovy-2.4'
+        swaggerVersion = '2.9.2'
     }
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
     }
 }
 
 apply plugin: 'java'
-apply plugin: 'eclipse'
+apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'jacoco'
+apply plugin: 'groovy'
 
 group = 'io.piloot'
+jar.baseName = 'piloot-engine'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+configurations {
+    //remove logback as default spring-logger, log4j is meant to be used
+    it.all*.exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
+
+    //remove tomcat as default web container, jetty is meant to be used
+    it.all*.exclude group: "org.springframework.boot", module: "spring-boot-starter-tomcat"
+}
 
 repositories {
     mavenCentral()
 }
 
-
 dependencies {
-    compile('org.springframework.boot:spring-boot-starter')
-    testCompile('org.springframework.boot:spring-boot-starter-test')
+    compile 'org.springframework.boot:spring-boot-starter'
+    compile 'org.springframework.boot:spring-boot-starter-log4j2'
+
+    compileOnly "org.projectlombok:lombok:$lombokVersion"
+
+    testCompile "org.spockframework:spock-core:$spockVersion"
+    testCompile "org.spockframework:spock-spring:$spockVersion"
+    testCompile "org.codehaus.groovy:groovy-all:$groovyAllVersion"
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
 
 jacocoTestReport {
